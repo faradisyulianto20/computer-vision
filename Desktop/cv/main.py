@@ -1,8 +1,28 @@
+import numpy as np
 import cv2
 
-img = cv2.imread('image.jpg', 0)
-img = cv2.resize(img, (600, 600))
+cap = cv2.VideoCapture(0)
 
-cv2.imshow('Image', img)
-cv2.waitKey(0)
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    width = int(cap.get(3))
+    height = int(cap.get(4))
+    
+    image = np.zeros(frame.shape, np.uint8)
+
+    smaller_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+
+    image[:height//2, :width//2]   = smaller_frame   
+    image[height//2:, :width//2]   = smaller_frame   
+    image[:height//2, width//2:]   = smaller_frame   
+    image[height//2:, width//2:]   = cv2.rotate(smaller_frame, cv2.ROTATE_180)
+    cv2.imshow('Webcam', image)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
 cv2.destroyAllWindows()
